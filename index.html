@@ -675,12 +675,182 @@
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
+  /* ─── MOBILE NAV BAR (fixe en bas) ─────────────────────────────────────── */
+  #mobile-nav {
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 64px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    z-index: 90;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 8px;
+    backdrop-filter: blur(12px);
+  }
+  .mob-nav-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.55rem;
+    padding: 8px 16px;
+    border-radius: 10px;
+    transition: color .15s, background .15s;
+    position: relative;
+  }
+  .mob-nav-btn .mob-icon { font-size: 1.3rem; line-height: 1; }
+  .mob-nav-btn.active { color: var(--accent); }
+  .mob-nav-btn.active .mob-icon { filter: drop-shadow(0 0 6px rgba(108,99,255,.5)); }
+  .mob-nav-fav-badge {
+    position: absolute;
+    top: 4px; right: 8px;
+    background: #f7c948;
+    color: #000;
+    border-radius: 8px;
+    padding: 1px 5px;
+    font-size: 0.5rem;
+    font-weight: 700;
+    display: none;
+    min-width: 16px;
+    text-align: center;
+  }
+  .mob-nav-fav-badge.visible { display: block; }
+  /* Indicateur de filtres actifs */
+  .mob-filter-dot {
+    position: absolute;
+    top: 5px; right: 10px;
+    width: 7px; height: 7px;
+    background: var(--accent2);
+    border-radius: 50%;
+    display: none;
+  }
+  .mob-filter-dot.visible { display: block; }
+
+  /* ─── BOTTOM SHEET FILTRE ───────────────────────────────────────────────── */
+  #filter-sheet {
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-radius: 20px 20px 0 0;
+    z-index: 95;
+    max-height: 88vh;
+    overflow-y: auto;
+    transform: translateY(100%);
+    transition: transform .3s cubic-bezier(.4,0,.2,1);
+    padding-bottom: env(safe-area-inset-bottom, 16px);
+  }
+  #filter-sheet.open { transform: translateY(0); }
+  #filter-sheet::-webkit-scrollbar { display: none; }
+  .sheet-handle {
+    width: 36px; height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 12px auto 0;
+  }
+  .sheet-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px 12px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--surface);
+    z-index: 1;
+  }
+  .sheet-header h3 { font-size: 1rem; font-weight: 700; }
+  .sheet-content { padding: 16px 20px 80px; display: flex; flex-direction: column; gap: 24px; }
+  .btn-apply-filters {
+    display: none;
+    position: fixed;
+    bottom: 80px; left: 20px; right: 20px;
+    padding: 14px;
+    background: var(--accent);
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    z-index: 96;
+    box-shadow: 0 4px 20px rgba(108,99,255,.4);
+    transition: transform .1s;
+  }
+  .btn-apply-filters:active { transform: scale(.97); }
+
+  /* ─── MOBILE HEADER ─────────────────────────────────────────────────────── */
   @media (max-width: 768px) {
-    .app-body { grid-template-columns: 1fr; }
-    aside { position: static; max-height: none; border-right: none; border-bottom: 1px solid var(--border); }
-    main { padding: 20px; }
-    header { padding: 20px; }
-    header h1 { font-size: 1.2rem; }
+    header {
+      padding: 14px 16px;
+      gap: 12px;
+    }
+    .logo-icon { width: 36px; height: 36px; font-size: 16px; border-radius: 9px; }
+    header h1 { font-size: 1rem; }
+    header p { font-size: 0.6rem; }
+    #data-source { display: none; }
+    #result-count {
+      font-size: 0.68rem;
+      padding: 4px 10px;
+    }
+    #btn-open-fav { display: none; } /* remplacé par le nav mobile */
+    .header-right { gap: 8px; }
+
+    /* Layout : masquer la sidebar desktop, plein écran pour main */
+    .app-body { display: block; }
+    aside { display: none; }
+    main {
+      padding: 12px 12px 80px; /* 80px pour laisser place à la nav bar */
+    }
+
+    /* Grille : 1 colonne sur mobile */
+    #cards-grid {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    /* Cartes plus compactes */
+    .card { padding: 14px; gap: 9px; }
+    .card-title { font-size: 0.85rem; }
+    .card-desc { font-size: 0.7rem; }
+    .theme-chip { font-size: 0.57rem; padding: 2px 5px; }
+    .pill { font-size: 0.6rem; padding: 3px 7px; }
+
+    /* Sort bar compacte */
+    .sort-bar { gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+    .sort-btn { font-size: 0.65rem; padding: 4px 9px; }
+    .sort-bar span { font-size: 0.65rem; }
+
+    /* Nav mobile visible */
+    #mobile-nav { display: flex; }
+
+    /* Bottom sheet visible */
+    #filter-sheet { display: block; }
+    .btn-apply-filters { display: block; }
+
+    /* Panneau favoris : plein écran sur mobile */
+    #fav-panel {
+      width: 100%;
+      right: -100%;
+    }
+    #fav-panel.open { right: 0; }
+
+    /* Toast plus haut pour éviter la nav bar */
+    #toast { bottom: 80px; }
+  }
+
+  @media (max-width: 380px) {
+    header h1 { font-size: 0.9rem; }
+    .mob-nav-btn { padding: 8px 10px; font-size: 0.5rem; }
   }
 </style>
 </head>
@@ -791,8 +961,77 @@
 <!-- Toast -->
 <div id="toast"></div>
 
+<!-- ─── MOBILE NAV BAR ─────────────────────────────────────────────────── -->
+<nav id="mobile-nav">
+  <button class="mob-nav-btn active" id="mob-btn-home">
+    <span class="mob-icon">🔍</span>
+    Annales
+  </button>
+  <button class="mob-nav-btn" id="mob-btn-filter">
+    <span class="mob-icon">⚙️</span>
+    Filtres
+    <span class="mob-filter-dot" id="mob-filter-dot"></span>
+  </button>
+  <button class="mob-nav-btn" id="mob-btn-fav">
+    <span class="mob-icon">⭐</span>
+    Favoris
+    <span class="mob-nav-fav-badge" id="mob-fav-badge">0</span>
+  </button>
+</nav>
 
-<script src="data_labolycee.js"></script> 
+<!-- ─── BOTTOM SHEET FILTRES ──────────────────────────────────────────── -->
+<div id="filter-sheet-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:94;opacity:0;transition:opacity .3s;"></div>
+<div id="filter-sheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <h3>⚙️ Filtres</h3>
+    <button class="btn-reset" id="btn-reset-mobile" style="margin:0;width:auto;padding:6px 12px;font-size:0.65rem;">↺ Reset</button>
+  </div>
+  <div class="sheet-content">
+    <!-- Durée -->
+    <div class="filter-section">
+      <h3>⏱ Durée</h3>
+      <div class="duration-display">
+        <span class="duration-val" id="mob-dur-min-label">0 min</span>
+        <span class="duration-sep">→</span>
+        <span class="duration-val" id="mob-dur-max-label">3h+</span>
+      </div>
+      <div class="dual-range-wrap">
+        <div class="dual-range-track"></div>
+        <div class="dual-range-fill" id="mob-range-fill"></div>
+        <input type="range" id="mob-dur-min" min="0" max="180" value="0" step="5">
+        <input type="range" id="mob-dur-max" min="0" max="180" value="180" step="5">
+      </div>
+      <div class="range-labels"><span>0 min</span><span>3h+</span></div>
+    </div>
+
+    <!-- Thèmes physique -->
+    <div class="filter-section">
+      <h3>⚛️ Thèmes physique</h3>
+      <div class="tags-grid" id="mob-phys-tags"></div>
+      <div class="tag-mode-hint">1 clic = inclure &nbsp;|&nbsp; 2 clics = exclure &nbsp;|&nbsp; 3 clics = reset</div>
+    </div>
+
+    <!-- Thèmes chimie -->
+    <div class="filter-section">
+      <h3>🧪 Thèmes chimie</h3>
+      <div class="tags-grid" id="mob-chem-tags"></div>
+    </div>
+
+    <!-- Options -->
+    <div class="filter-section">
+      <h3>✅ Options</h3>
+      <div class="toggle-row" id="mob-toggle-corr">
+        <span class="toggle-label">Correction disponible</span>
+        <div class="toggle" id="mob-toggle-corr-dot"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<button class="btn-apply-filters" id="btn-apply-filters">Voir les résultats (<span id="apply-count">—</span>)</button>
+
+
+<script src="data_labolycee.js"></script>
 <script>
 // ─── DATA ───────────────────────────────────────────────────────────────────
 // Données extraites du site labolycee.org (exercices Tale Spé PC)
@@ -1081,11 +1320,13 @@ function showToast(msg) {
 }
 
 function updateFavBadge() {
-  const badge = document.getElementById('fav-badge');
   const n = favorites.size;
+  const badge = document.getElementById('fav-badge');
   badge.textContent = n;
   badge.classList.toggle('visible', n > 0);
   document.getElementById('fav-count-badge').textContent = n;
+  // Sync mobile
+  updateMobFavBadge();
 }
 
 function toggleFav(url) {
@@ -1205,14 +1446,154 @@ sliderMax.addEventListener('input', () => {
 });
 updateFill();
 
-// ─── INIT ─────────────────────────────────────────────────────────────────────
-buildTags(document.getElementById('phys-tags'), PHYS_THEMES, false);
-buildTags(document.getElementById('chem-tags'), CHEM_THEMES, true);
+// ─── MOBILE ───────────────────────────────────────────────────────────────────
 
-// Toggle correction
+const mobSliderMin = document.getElementById('mob-dur-min');
+const mobSliderMax = document.getElementById('mob-dur-max');
+const mobFill      = document.getElementById('mob-range-fill');
+const MOBILE_RANGE = 180;
+
+function updateMobFill() {
+  const lo = +mobSliderMin.value, hi = +mobSliderMax.value;
+  mobFill.style.left  = (lo / MOBILE_RANGE * 100) + '%';
+  mobFill.style.width = ((hi - lo) / MOBILE_RANGE * 100) + '%';
+  document.getElementById('mob-dur-min-label').textContent = durLabel(lo);
+  document.getElementById('mob-dur-max-label').textContent = durLabel(hi);
+}
+
+mobSliderMin.addEventListener('input', () => {
+  if (+mobSliderMin.value > +mobSliderMax.value - MIN_GAP) mobSliderMin.value = +mobSliderMax.value - MIN_GAP;
+  sliderMin.value = mobSliderMin.value;
+  minDur = +mobSliderMin.value;
+  updateFill(); updateMobFill(); updateApplyCount();
+});
+mobSliderMax.addEventListener('input', () => {
+  if (+mobSliderMax.value < +mobSliderMin.value + MIN_GAP) mobSliderMax.value = +mobSliderMin.value + MIN_GAP;
+  sliderMax.value = mobSliderMax.value;
+  maxDur = +mobSliderMax.value;
+  updateFill(); updateMobFill(); updateApplyCount();
+});
+updateMobFill();
+
+function buildMobTags(container, themes, isChem) {
+  themes.forEach(th => {
+    const el = document.createElement('button');
+    el.className = 'tag';
+    el.textContent = th;
+    el.dataset.theme = th;
+    el.addEventListener('click', () => {
+      if (themeState[th] === '')             themeState[th] = 'include';
+      else if (themeState[th] === 'include') themeState[th] = 'exclude';
+      else                                   themeState[th] = '';
+      syncAllTags();
+      updateApplyCount();
+    });
+    container.appendChild(el);
+  });
+}
+
+function syncAllTags() {
+  document.querySelectorAll('.tag').forEach(el => {
+    const th = el.dataset.theme;
+    if (!th || !(th in themeState)) return;
+    const isChem = CHEM_THEMES_ORDER.includes(th);
+    applyTagStyle(el, themeState[th], isChem);
+  });
+  updateFilterDot();
+}
+
+function updateFilterDot() {
+  const hasFilters = minDur > 0 || maxDur < 180 || corrOnly ||
+    Object.values(themeState).some(s => s !== '');
+  const dot = document.getElementById('mob-filter-dot');
+  if (dot) dot.classList.toggle('visible', hasFilters);
+}
+
+function updateApplyCount() {
+  const el = document.getElementById('apply-count');
+  if (el) el.textContent = filter().length;
+}
+
+function updateMobFavBadge() {
+  const n = favorites.size;
+  const b = document.getElementById('mob-fav-badge');
+  if (b) { b.textContent = n; b.classList.toggle('visible', n > 0); }
+}
+
+// Toggle correction mobile
+document.getElementById('mob-toggle-corr').addEventListener('click', () => {
+  corrOnly = !corrOnly;
+  document.getElementById('mob-toggle-corr-dot').classList.toggle('on', corrOnly);
+  document.getElementById('toggle-corr-dot').classList.toggle('on', corrOnly);
+  updateApplyCount(); updateFilterDot();
+});
+
+// Reset mobile
+document.getElementById('btn-reset-mobile').addEventListener('click', () => {
+  Object.keys(themeState).forEach(k => themeState[k] = '');
+  syncAllTags();
+  minDur = 0; maxDur = 180;
+  sliderMin.value = 0;    sliderMax.value = 180;
+  mobSliderMin.value = 0; mobSliderMax.value = 180;
+  updateFill(); updateMobFill();
+  corrOnly = false;
+  document.getElementById('toggle-corr-dot').classList.remove('on');
+  document.getElementById('mob-toggle-corr-dot').classList.remove('on');
+  updateApplyCount(); updateFilterDot();
+});
+
+// Bottom sheet
+const filterSheet   = document.getElementById('filter-sheet');
+const filterOverlay = document.getElementById('filter-sheet-overlay');
+
+function openFilterSheet() {
+  mobSliderMin.value = sliderMin.value;
+  mobSliderMax.value = sliderMax.value;
+  updateMobFill(); syncAllTags(); updateApplyCount();
+  filterSheet.classList.add('open');
+  filterOverlay.style.display = 'block';
+  requestAnimationFrame(() => filterOverlay.style.opacity = '1');
+  document.getElementById('mob-btn-filter').classList.add('active');
+  document.getElementById('mob-btn-home').classList.remove('active');
+}
+
+function closeFilterSheet() {
+  filterSheet.classList.remove('open');
+  filterOverlay.style.opacity = '0';
+  setTimeout(() => { filterOverlay.style.display = 'none'; }, 300);
+  document.getElementById('mob-btn-filter').classList.remove('active');
+  document.getElementById('mob-btn-home').classList.add('active');
+  render();
+}
+
+document.getElementById('mob-btn-filter').addEventListener('click', openFilterSheet);
+document.getElementById('btn-apply-filters').addEventListener('click', closeFilterSheet);
+filterOverlay.addEventListener('click', closeFilterSheet);
+document.getElementById('mob-btn-home').addEventListener('click', () => { closeFilterSheet(); });
+document.getElementById('mob-btn-fav').addEventListener('click', () => { openFavPanel(); });
+
+// Swipe down pour fermer le sheet
+let touchStartY = 0;
+filterSheet.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; }, { passive: true });
+filterSheet.addEventListener('touchmove',  e => {
+  if (e.touches[0].clientY - touchStartY > 70) closeFilterSheet();
+}, { passive: true });
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+const { phys: desktopPhys, chem: desktopChem } = buildThemeLists();
+buildTags(document.getElementById('phys-tags'), desktopPhys, false);
+buildTags(document.getElementById('chem-tags'), desktopChem, true);
+// Tags mobile (mêmes listes)
+buildMobTags(document.getElementById('mob-phys-tags'), desktopPhys, false);
+buildMobTags(document.getElementById('mob-chem-tags'), desktopChem, true);
+
+// Toggle correction desktop
 document.getElementById('toggle-corr').addEventListener('click', () => {
   corrOnly = !corrOnly;
   document.getElementById('toggle-corr-dot').classList.toggle('on', corrOnly);
+  // sync mobile
+  const mobDot = document.getElementById('mob-toggle-corr-dot');
+  if (mobDot) mobDot.classList.toggle('on', corrOnly);
   render();
 });
 
@@ -1226,15 +1607,18 @@ document.querySelectorAll('.sort-btn').forEach(btn => {
   });
 });
 
-// Reset
+// Reset desktop
 document.getElementById('btn-reset').addEventListener('click', () => {
   Object.keys(themeState).forEach(k => themeState[k] = '');
-  document.querySelectorAll('.tag').forEach(t => t.classList.remove('active','active-chem','excluded'));
+  syncAllTags();
   minDur = 0; maxDur = 180;
-  sliderMin.value = 0; sliderMax.value = 180;
-  updateFill();
+  sliderMin.value = 0;    sliderMax.value = 180;
+  mobSliderMin.value = 0; mobSliderMax.value = 180;
+  updateFill(); updateMobFill();
   corrOnly = false;
   document.getElementById('toggle-corr-dot').classList.remove('on');
+  document.getElementById('mob-toggle-corr-dot').classList.remove('on');
+  updateFilterDot();
   render();
 });
 
@@ -1248,6 +1632,7 @@ if (typeof SCRAPED_DATA !== 'undefined' && SCRAPED_DATA.length > 0) {
   srcEl.innerHTML = '⚠️ données partielles — <a href="#" style="color:var(--accent);text-decoration:none;" onclick="document.getElementById(\'howto\').style.display=\'block\';return false;">lancer le scraper</a>';
 }
 render();
+
 </script>
 </body>
 </html>
