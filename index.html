@@ -733,47 +733,62 @@
   }
   .mob-filter-dot.visible { display: block; }
 
-  /* ─── BOTTOM SHEET FILTRE ───────────────────────────────────────────────── */
-  #filter-sheet {
+  /* ─── MOBILE PAGES PLEIN ÉCRAN ─────────────────────────────────────────── */
+  #mob-page-filters,
+  #mob-page-favs {
     display: none;
     position: fixed;
-    bottom: 0; left: 0; right: 0;
-    background: var(--surface);
-    border-top: 1px solid var(--border);
-    border-radius: 20px 20px 0 0;
-    z-index: 95;
-    max-height: 88vh;
-    overflow-y: auto;
-    transform: translateY(100%);
-    transition: transform .3s cubic-bezier(.4,0,.2,1);
-    padding-bottom: env(safe-area-inset-bottom, 16px);
+    inset: 0;
+    bottom: 64px;
+    background: var(--bg);
+    z-index: 80;
+    flex-direction: column;
+    overflow: hidden;
   }
-  #filter-sheet.open { transform: translateY(0); }
-  #filter-sheet::-webkit-scrollbar { display: none; }
-  .sheet-handle {
-    width: 36px; height: 4px;
-    background: var(--border);
-    border-radius: 2px;
-    margin: 12px auto 0;
+  #mob-page-filters.mob-active,
+  #mob-page-favs.mob-active {
+    display: flex;
   }
-  .sheet-header {
+  .mob-page-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 20px 12px;
+    padding: 16px 20px 14px;
     border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 0;
     background: var(--surface);
-    z-index: 1;
+    flex-shrink: 0;
   }
-  .sheet-header h3 { font-size: 1rem; font-weight: 700; }
-  .sheet-content { padding: 16px 20px 80px; display: flex; flex-direction: column; gap: 24px; }
-  .btn-apply-filters {
-    display: none;
-    position: fixed;
-    bottom: 80px; left: 20px; right: 20px;
-    padding: 14px;
+  .mob-page-header h2 { font-size: 1rem; font-weight: 800; }
+  .mob-page-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .mob-page-body::-webkit-scrollbar { display: none; }
+
+  #mob-page-filters .tag {
+    font-size: 0.75rem;
+    padding: 8px 13px;
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+  }
+  #mob-page-filters .tags-grid { gap: 8px; }
+
+  .mob-filter-actions {
+    display: flex;
+    gap: 10px;
+    padding: 14px 20px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    flex-shrink: 0;
+  }
+  .btn-mob-apply {
+    flex: 1;
+    padding: 13px;
     background: var(--accent);
     border: none;
     border-radius: 12px;
@@ -782,11 +797,32 @@
     font-size: 0.9rem;
     font-weight: 700;
     cursor: pointer;
-    z-index: 96;
-    box-shadow: 0 4px 20px rgba(108,99,255,.4);
+    box-shadow: 0 4px 20px rgba(108,99,255,.35);
     transition: transform .1s;
   }
-  .btn-apply-filters:active { transform: scale(.97); }
+  .btn-mob-apply:active { transform: scale(.97); }
+  .btn-mob-reset {
+    padding: 13px 16px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    cursor: pointer;
+    transition: border-color .15s, color .15s;
+    white-space: nowrap;
+  }
+  .btn-mob-reset:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  .mob-fav-footer {
+    display: flex;
+    gap: 8px;
+    padding: 14px 20px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    flex-shrink: 0;
+  }
 
   /* ─── MOBILE HEADER ─────────────────────────────────────────────────────── */
   @media (max-width: 768px) {
@@ -825,6 +861,8 @@
     .theme-chip { font-size: 0.57rem; padding: 2px 5px; }
     .pill { font-size: 0.6rem; padding: 3px 7px; }
 
+    /* Tags plus grands et plus faciles à toucher sur mobile */
+
     /* Sort bar compacte */
     .sort-bar { gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
     .sort-btn { font-size: 0.65rem; padding: 4px 9px; }
@@ -833,16 +871,9 @@
     /* Nav mobile visible */
     #mobile-nav { display: flex; }
 
-    /* Bottom sheet visible */
-    #filter-sheet { display: block; }
-    .btn-apply-filters { display: block; }
-
-    /* Panneau favoris : plein écran sur mobile */
-    #fav-panel {
-      width: 100%;
-      right: -100%;
-    }
-    #fav-panel.open { right: 0; }
+    /* Panneau favoris desktop masqué (géré par la page mob) */
+    #fav-panel { display: none !important; }
+    #fav-overlay { display: none !important; }
 
     /* Toast plus haut pour éviter la nav bar */
     #toast { bottom: 80px; }
@@ -979,15 +1010,13 @@
   </button>
 </nav>
 
-<!-- ─── BOTTOM SHEET FILTRES ──────────────────────────────────────────── -->
-<div id="filter-sheet-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:94;opacity:0;transition:opacity .3s;"></div>
-<div id="filter-sheet">
-  <div class="sheet-handle"></div>
-  <div class="sheet-header">
-    <h3>⚙️ Filtres</h3>
-    <button class="btn-reset" id="btn-reset-mobile" style="margin:0;width:auto;padding:6px 12px;font-size:0.65rem;">↺ Reset</button>
+<!-- ─── PAGE MOBILE : FILTRES ──────────────────────────────────────────── -->
+<div id="mob-page-filters">
+  <div class="mob-page-header">
+    <h2>⚙️ Filtres</h2>
+    <span id="mob-filter-count" style="font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--muted);"></span>
   </div>
-  <div class="sheet-content">
+  <div class="mob-page-body">
     <!-- Durée -->
     <div class="filter-section">
       <h3>⏱ Durée</h3>
@@ -1005,6 +1034,15 @@
       <div class="range-labels"><span>0 min</span><span>3h+</span></div>
     </div>
 
+    <!-- Options -->
+    <div class="filter-section">
+      <h3>✅ Options</h3>
+      <div class="toggle-row" id="mob-toggle-corr">
+        <span class="toggle-label">Correction disponible</span>
+        <div class="toggle" id="mob-toggle-corr-dot"></div>
+      </div>
+    </div>
+
     <!-- Thèmes physique -->
     <div class="filter-section">
       <h3>⚛️ Thèmes physique</h3>
@@ -1017,18 +1055,27 @@
       <h3>🧪 Thèmes chimie</h3>
       <div class="tags-grid" id="mob-chem-tags"></div>
     </div>
-
-    <!-- Options -->
-    <div class="filter-section">
-      <h3>✅ Options</h3>
-      <div class="toggle-row" id="mob-toggle-corr">
-        <span class="toggle-label">Correction disponible</span>
-        <div class="toggle" id="mob-toggle-corr-dot"></div>
-      </div>
-    </div>
+  </div>
+  <div class="mob-filter-actions">
+    <button class="btn-mob-reset" id="btn-reset-mobile">↺ Reset</button>
+    <button class="btn-mob-apply" id="btn-apply-filters">Voir les résultats (<span id="apply-count">—</span>)</button>
   </div>
 </div>
-<button class="btn-apply-filters" id="btn-apply-filters">Voir les résultats (<span id="apply-count">—</span>)</button>
+
+<!-- ─── PAGE MOBILE : FAVORIS ──────────────────────────────────────────── -->
+<div id="mob-page-favs">
+  <div class="mob-page-header">
+    <h2>⭐ Favoris</h2>
+    <span class="fav-count-badge" id="mob-fav-count-badge">0</span>
+  </div>
+  <div class="mob-page-body" style="padding:12px 16px;">
+    <div id="mob-fav-list"></div>
+  </div>
+  <div class="mob-fav-footer">
+    <button class="btn-export-fav" id="mob-btn-export-fav">↓ Exporter (.txt)</button>
+    <button class="btn-clear-fav" id="mob-btn-clear-fav">Tout supprimer</button>
+  </div>
+</div>
 
 
 <script src="data_labolycee.js"></script>
@@ -1324,7 +1371,10 @@ function updateFavBadge() {
   const badge = document.getElementById('fav-badge');
   badge.textContent = n;
   badge.classList.toggle('visible', n > 0);
-  document.getElementById('fav-count-badge').textContent = n;
+  const cb = document.getElementById('fav-count-badge');
+  if (cb) cb.textContent = n;
+  const mcb = document.getElementById('mob-fav-count-badge');
+  if (mcb) mcb.textContent = n;
   // Sync mobile
   updateMobFavBadge();
 }
@@ -1507,11 +1557,15 @@ function updateFilterDot() {
     Object.values(themeState).some(s => s !== '');
   const dot = document.getElementById('mob-filter-dot');
   if (dot) dot.classList.toggle('visible', hasFilters);
+  // met à jour le petit compteur dans le header de la page filtre
+  const fc = document.getElementById('mob-filter-count');
+  if (fc) fc.textContent = hasFilters ? `${filter().length} résultats` : '';
 }
 
 function updateApplyCount() {
   const el = document.getElementById('apply-count');
   if (el) el.textContent = filter().length;
+  updateFilterDot();
 }
 
 function updateMobFavBadge() {
@@ -1525,7 +1579,7 @@ document.getElementById('mob-toggle-corr').addEventListener('click', () => {
   corrOnly = !corrOnly;
   document.getElementById('mob-toggle-corr-dot').classList.toggle('on', corrOnly);
   document.getElementById('toggle-corr-dot').classList.toggle('on', corrOnly);
-  updateApplyCount(); updateFilterDot();
+  updateApplyCount();
 });
 
 // Reset mobile
@@ -1539,45 +1593,122 @@ document.getElementById('btn-reset-mobile').addEventListener('click', () => {
   corrOnly = false;
   document.getElementById('toggle-corr-dot').classList.remove('on');
   document.getElementById('mob-toggle-corr-dot').classList.remove('on');
-  updateApplyCount(); updateFilterDot();
+  updateApplyCount();
 });
 
-// Bottom sheet
-const filterSheet   = document.getElementById('filter-sheet');
-const filterOverlay = document.getElementById('filter-sheet-overlay');
+// ─── MOBILE : NAVIGATION PAR PAGES ───────────────────────────────────────────
 
-function openFilterSheet() {
-  mobSliderMin.value = sliderMin.value;
-  mobSliderMax.value = sliderMax.value;
-  updateMobFill(); syncAllTags(); updateApplyCount();
-  filterSheet.classList.add('open');
-  filterOverlay.style.display = 'block';
-  requestAnimationFrame(() => filterOverlay.style.opacity = '1');
-  document.getElementById('mob-btn-filter').classList.add('active');
-  document.getElementById('mob-btn-home').classList.remove('active');
+const mobPageFilters = document.getElementById('mob-page-filters');
+const mobPageFavs    = document.getElementById('mob-page-favs');
+const btnHome        = document.getElementById('mob-btn-home');
+const btnFilter      = document.getElementById('mob-btn-filter');
+const btnFav         = document.getElementById('mob-btn-fav');
+
+function setMobPage(page) {
+  // masque toutes les pages
+  mobPageFilters.classList.remove('mob-active');
+  mobPageFavs.classList.remove('mob-active');
+  // reset nav
+  btnHome.classList.remove('active');
+  btnFilter.classList.remove('active');
+  btnFav.classList.remove('active');
+
+  if (page === 'filters') {
+    mobPageFilters.classList.add('mob-active');
+    btnFilter.classList.add('active');
+    mobSliderMin.value = sliderMin.value;
+    mobSliderMax.value = sliderMax.value;
+    updateMobFill(); syncAllTags(); updateApplyCount();
+    document.body.style.overflow = 'hidden';
+  } else if (page === 'favs') {
+    mobPageFavs.classList.add('mob-active');
+    btnFav.classList.add('active');
+    renderMobFavPanel();
+    document.body.style.overflow = 'hidden';
+  } else {
+    // home / annales
+    btnHome.classList.add('active');
+    document.body.style.overflow = '';
+    render();
+  }
 }
 
-function closeFilterSheet() {
-  filterSheet.classList.remove('open');
-  filterOverlay.style.opacity = '0';
-  setTimeout(() => { filterOverlay.style.display = 'none'; }, 300);
-  document.getElementById('mob-btn-filter').classList.remove('active');
-  document.getElementById('mob-btn-home').classList.add('active');
-  render();
+btnHome.addEventListener('click',   () => setMobPage('home'));
+btnFilter.addEventListener('click', () => setMobPage('filters'));
+btnFav.addEventListener('click',    () => setMobPage('favs'));
+
+// Appliquer les filtres → retour aux annales
+document.getElementById('btn-apply-filters').addEventListener('click', () => setMobPage('home'));
+
+// ─── FAVORIS MOBILE ───────────────────────────────────────────────────────────
+
+function renderMobFavPanel() {
+  const list  = document.getElementById('mob-fav-list');
+  const badge = document.getElementById('mob-fav-count-badge');
+  if (badge) badge.textContent = favorites.size;
+  if (!list) return;
+  if (favorites.size === 0) {
+    list.innerHTML = '<div class="fav-empty"><div class="fav-empty-icon">⭐</div><p>Aucun favori<br>Marque des exercices pour les retrouver ici</p></div>';
+    return;
+  }
+  list.innerHTML = '';
+  [...favorites].forEach(url => {
+    const e = getExoByUrl(url);
+    if (!e) return;
+    const item = document.createElement('div');
+    item.className = 'fav-item';
+    const d = e.dur ? durStr(e.dur) : '?';
+    const p = e.pts ? `${e.pts} pts` : '';
+    item.innerHTML = `
+      <div class="fav-item-title">${e.t}</div>
+      <div class="fav-item-meta">
+        ${d ? `<span class="pill pill-time">⏱ ${d}</span>` : ''}
+        ${p ? `<span class="pill pill-pts">◆ ${p}</span>` : ''}
+        ${e.corr ? '<span class="pill pill-ok">✓ Corrigé</span>' : ''}
+      </div>
+      <div class="fav-item-actions">
+        <a class="fav-link" href="${url}" target="_blank">Ouvrir →</a>
+        <button class="btn-remove-fav" data-url="${url}">Retirer</button>
+      </div>`;
+    list.appendChild(item);
+  });
+  list.querySelectorAll('.btn-remove-fav').forEach(btn => {
+    btn.addEventListener('click', () => {
+      favorites.delete(btn.dataset.url);
+      saveFavs(); updateFavBadge(); updateMobFavBadge();
+      renderMobFavPanel(); render();
+      showToast('Retiré des favoris');
+    });
+  });
 }
 
-document.getElementById('mob-btn-filter').addEventListener('click', openFilterSheet);
-document.getElementById('btn-apply-filters').addEventListener('click', closeFilterSheet);
-filterOverlay.addEventListener('click', closeFilterSheet);
-document.getElementById('mob-btn-home').addEventListener('click', () => { closeFilterSheet(); });
-document.getElementById('mob-btn-fav').addEventListener('click', () => { openFavPanel(); });
+document.getElementById('mob-btn-export-fav').addEventListener('click', () => {
+  if (favorites.size === 0) { showToast('Aucun favori à exporter'); return; }
+  const lines = [...favorites].map(url => {
+    const e = getExoByUrl(url);
+    if (!e) return url;
+    const d = e.dur ? durStr(e.dur) : '?';
+    const p = e.pts ? `${e.pts} pts` : '';
+    const c = e.corr ? 'Corrigé' : 'Sans corrigé';
+    return `${e.t}\n  Session : ${e.session || '?'}\n  Durée : ${d}  ${p}  ${c}\n  Thèmes : ${(e.themes||[]).join(', ')}\n  Lien : ${url}\n`;
+  });
+  const blob = new Blob([`Mes favoris — Labolycée\n${'='.repeat(40)}\n\n` + lines.join('\n')], {type: 'text/plain;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'favoris_labolycee.txt';
+  a.click();
+  showToast(`↓ Export de ${favorites.size} favoris`);
+});
 
-// Swipe down pour fermer le sheet
-let touchStartY = 0;
-filterSheet.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; }, { passive: true });
-filterSheet.addEventListener('touchmove',  e => {
-  if (e.touches[0].clientY - touchStartY > 70) closeFilterSheet();
-}, { passive: true });
+document.getElementById('mob-btn-clear-fav').addEventListener('click', () => {
+  if (favorites.size === 0) return;
+  if (confirm(`Supprimer les ${favorites.size} favoris ?`)) {
+    favorites.clear();
+    saveFavs(); updateFavBadge(); updateMobFavBadge();
+    renderMobFavPanel(); render();
+    showToast('Favoris supprimés');
+  }
+});
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 const { phys: desktopPhys, chem: desktopChem } = buildThemeLists();
